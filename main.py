@@ -61,6 +61,7 @@ class DataAnalyzerApp:
         self.scatter_color = "blue"
         self.boxplot_color = "green"
         self.current_language = "en"  # Default language is English
+        self.histogram_color = "skyblue"  # Default histogram color
 
         # Translations dictionary
         self.translations = {
@@ -97,7 +98,8 @@ class DataAnalyzerApp:
                 "min_value": "Min Value:",
                 "max_value": "Max Value:",
                 "apply_filter": "Apply Filter",
-                "histogram": "Histogram"
+                "histogram": "Histogram",
+                "histogram_color": "Histogram Color"
             },
             "ru": {
                 "title": "Анализ Данных",
@@ -132,7 +134,8 @@ class DataAnalyzerApp:
                 "min_value": "Мин. значение:",
                 "max_value": "Макс. значение:",
                 "apply_filter": "Применить фильтр",
-                "histogram": "Гистограмма"
+                "histogram": "Гистограмма",
+                "histogram_color": "Цвет гистограммы"
             }
         }
 
@@ -213,6 +216,10 @@ class DataAnalyzerApp:
         # Button to plot histogram
         self.histogram_button = tk.Button(self.inner_control_frame, text=self.translations[self.current_language]["histogram"], command=self.plot_histogram)
         self.histogram_button.pack()
+
+        # Button to choose histogram color
+        self.histogram_color_button = tk.Button(self.inner_control_frame, text=self.translations[self.current_language]["histogram_color"], command=self.choose_histogram_color)
+        self.histogram_color_button.pack()
 
         # Область для графиков (уменьшенные размеры)
         self.fig, (self.ax_scatter, self.ax_boxplot) = plt.subplots(2, 1, figsize=(4, 4))
@@ -325,6 +332,10 @@ class DataAnalyzerApp:
         # Button to plot histogram in Tab 2
         self.histogram_button_tab2 = tk.Button(self.inner_control_frame_tab2, text=self.translations[self.current_language]["histogram"], command=self.plot_histogram_tab2)
         self.histogram_button_tab2.pack()
+
+        # Button to choose histogram color in Tab 2
+        self.histogram_color_button_tab2 = tk.Button(self.inner_control_frame_tab2, text=self.translations[self.current_language]["histogram_color"], command=self.choose_histogram_color)
+        self.histogram_color_button_tab2.pack()
 
         # Labels and entry fields for min and max values
         self.min_value_label = tk.Label(self.inner_control_frame_tab2, text=self.translations[self.current_language]["min_value"])
@@ -739,6 +750,8 @@ class DataAnalyzerApp:
         self.mode_label_tab2.config(text=self.translations[self.current_language]["mode"])
         self.histogram_button.config(text=self.translations[self.current_language]["histogram"])
         self.histogram_button_tab2.config(text=self.translations[self.current_language]["histogram"])
+        self.histogram_color_button.config(text=self.translations[self.current_language]["histogram_color"])
+        self.histogram_color_button_tab2.config(text=self.translations[self.current_language]["histogram_color"])
         self.notebook.tab(0, text=self.translations[self.current_language]["tab1"])
         self.notebook.tab(1, text=self.translations[self.current_language]["tab2"])
         self.update_plots_and_stats()
@@ -760,7 +773,7 @@ class DataAnalyzerApp:
 
         # Create a new figure and axes
         fig, ax = plt.subplots(figsize=(6, 4))
-        sns.histplot(data.values, kde=False, ax=ax)  # Use seaborn for histogram
+        sns.histplot(data.values, kde=False, ax=ax, color=self.histogram_color)  # Use seaborn for histogram with color
         ax.set_title(f"{self.translations[self.current_language]['histogram']} ({self.selected_column})")
         ax.set_xlabel("Value")
         ax.set_ylabel("Frequency")
@@ -797,7 +810,7 @@ class DataAnalyzerApp:
 
         # Create a new figure and axes
         fig, ax = plt.subplots(figsize=(6, 4))
-        sns.histplot(data.values, kde=False, ax=ax)  # Use seaborn for histogram
+        sns.histplot(data.values, kde=False, ax=ax, color=self.histogram_color)  # Use seaborn for histogram with color
         ax.set_title(f"{self.translations[self.current_language]['histogram']} ({selected_column})")
         ax.set_xlabel("Value")
         ax.set_ylabel("Frequency")
@@ -815,6 +828,13 @@ class DataAnalyzerApp:
 
         # Add pan and zoom functionality
         self.add_pan_and_zoom(canvas, ax)
+
+    def choose_histogram_color(self):
+        color_code = colorchooser.askcolor(title=self.translations[self.current_language]["histogram_color"])
+        if color_code:
+            self.histogram_color = color_code[1]
+            # No need to redraw the existing plot, just store the color
+            # The color will be used when a new histogram is plotted
 
 root = tk.Tk()
 app = DataAnalyzerApp(root)
